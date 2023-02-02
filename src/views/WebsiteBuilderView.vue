@@ -186,9 +186,7 @@
 
 
         methods: {
-
            async buildWebsite() {
-               this.formData = [];
                 const payload = {
                     FirstName: this.formData.firstName,
                     LastName: this.formData.lastName,
@@ -206,7 +204,7 @@
                     InstagramLink: this.formData.instagramLink,
                 };
 
-                axios.post(`${url}/websites/build`, payload).then(async (response) => {
+                axios.post(`${url}/websites/build`, payload).then(response => {
 
                     console.log({payload});
 
