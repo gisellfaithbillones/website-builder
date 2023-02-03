@@ -1,9 +1,23 @@
 <template>
-    <body>
-    <div class="wrapper">
-        <v-form>
-        <div id="wizard">
-                <!-- SECTION 1 -->
+    <div v-if="!generatingWebsite">
+        <Wizard
+                squared-tabs
+                card-background
+                navigable-tabs
+                scrollable-tabs
+                :nextButton="nextButtonConfig"
+                :custom-tabs="customTabsConfig"
+                :beforeChange="onTabBeforeChange"
+                @change="onChangeCurrentTab"
+                @complete:wizard="wizardCompleted"
+        >
+            <div class="row justify-content-center my-5">
+                <div class="col-md-6 text-center">
+                    <h2>Tell Us About Your Website</h2>
+                </div>
+            </div>
+
+            <h5 v-if="currentTabIndex === 0">
                 <h4></h4>
                 <section>
                     <div class="form-header">
@@ -22,28 +36,32 @@
                         </div>
                         <div class="form-group">
                             <div class="form-holder active">
-                                <input type="text" placeholder="First Name" class="form-control" v-model="formData.firstName">
+                                <input type="text" placeholder="Owner First Name" class="form-control"
+                                       v-model="formData.firstName">
                             </div>
                             <div class="form-holder">
-                                <input type="text" placeholder="Last Name" class="form-control" v-model="formData.lastName">
+                                <input type="text" placeholder="Owner Last Name" class="form-control"
+                                       v-model="formData.lastName">
+                            </div>
+                            <div class="form-holder">
+                                <input type="text" placeholder="Owner Email" class="form-control" v-model="formData.email">
+                            </div>
+                            <div class="form-holder">
+                                <input type="password" placeholder="Create a password" class="form-control"
+                                       v-model="formData.password">
                             </div>
                         </div>
                     </div>
-                    <div class="form-holder">
-                        <input type="text" placeholder="Email" class="form-control" v-model="formData.email">
-                    </div>
-                    <div class="form-holder">
-                        <input type="password" placeholder="Create a password" class="form-control" v-model="formData.password">
-                    </div>
                 </section>
-
-                <!-- SECTION 2 -->
+            </h5>
+            <h5 v-if="currentTabIndex === 1">
                 <h4></h4>
                 <section>
-                    <h6> Tell us about your website</h6>
-                    <br>
+<!--                    <h6> Tell us about your website</h6>-->
+<!--                    <br>-->
                     <div class="form-holder">
-                        <input type="text" placeholder="Name of the Website" class="form-control" v-model="formData.websiteName">
+                        <input type="text" placeholder="Name of the Website" class="form-control"
+                               v-model="formData.websiteName">
                     </div>
                     <div class="form-holder">
                         <input type="text" placeholder="Description of the Website" class="form-control"
@@ -60,30 +78,35 @@
                         <input type="text" placeholder="Services" class="form-control" v-model="formData.services">
                     </div>
                 </section>
-
+            </h5>
+            <h5 v-if="currentTabIndex === 2">
                 <h4></h4>
                 <section>
-                    <h6> Tell us about your website</h6>
-                    <br>
+<!--                    <h6> Tell us about your website</h6>-->
+<!--                    <br>-->
                     <div class="form-holder">
-                        <input type="text" placeholder="Location" class="form-control" v-model="formData.companyLocation">
+                        <input type="text" placeholder="Location" class="form-control"
+                               v-model="formData.companyLocation">
                     </div>
                     <div class="form-holder">
-                        <input type="text" placeholder="Phone Number" class="form-control" v-model="formData.phoneNumber">
+                        <input type="text" placeholder="Phone Number" class="form-control"
+                               v-model="formData.phoneNumber">
                     </div>
                     <div class="form-holder">
                         <input type="text" placeholder="Email for Contact Us Page" class="form-control"
                                v-model="formData.emailContactUs">
                     </div>
                     <div class="form-holder">
-                        <input type="text" placeholder="Facebook Link" class="form-control" v-model="formData.twitterLink">
+                        <input type="text" placeholder="Facebook Link" class="form-control"
+                               v-model="formData.twitterLink">
                     </div>
                     <div class="form-holder">
-                        <input type="text" placeholder="Instagram Link" class="form-control" v-model="formData.instagramLink">
+                        <input type="text" placeholder="Instagram Link" class="form-control"
+                               v-model="formData.instagramLink">
                     </div>
                 </section>
-
-                <!-- SECTION 2 -->
+            </h5>
+            <h5 v-if="currentTabIndex === 3">
                 <h4></h4>
                 <section>
                     <div class="grid">
@@ -141,30 +164,62 @@
                         </div>
                     </div>
                 </section>
-
-                <!-- SECTION 3 -->
+            </h5>
+            <h5 v-if="currentTabIndex === 4">
                 <h4></h4>
-                <section>
-                    <h5>Choose a Theme </h5>
-                    // plot all images according to form and uploaded images
-                </section>
-            </div>
-        </v-form>
+                <div>
+                    <div v-html="htmlContent"></div>
+                </div>
+            </h5>
+        </Wizard>
     </div>
-    </body>
-</template>
-<script>
-    import { createApp } from 'vue';
-    import '../assets/js/jquery-3.3.1.min'
-    import '../assets/js/jquery.steps'
-    import '../assets/js/main'
-    import axios from 'axios'
-    import { url } from '../client_config/config';
 
+    <div class="col-sm-12 text-center" v-if="generatingWebsite">
+        <h1 class="text-success mt-5">Generating your website. Please wait...</h1>
+    </div>
+</template>
+
+<script>
+    import 'form-wizard-vue3/dist/form-wizard-vue3.css';
+    import Wizard from 'form-wizard-vue3';
+    import axios from 'axios'
+    import {url} from '../client_config/config';
+    import '../assets/js/jquery-3.3.1.min';
+    import '../assets/js/jquery.steps';
+    import '../assets/js/main';
 
     export default {
+        name: 'App',
+        components: {
+            Wizard,
+        },
         data() {
             return {
+                generatingWebsite: false,
+                currentTabIndex: 0,
+                nextButtonConfig: {
+                    text: 'Next',
+                    icon: 'check',
+                    hideIcon: true, // default false but selected for sample
+                    hideText: false, // default false but selected for sample
+                },
+                customTabsConfig: [
+                    {
+                        title: 'Personal Information',
+                    },
+                    {
+                        title: 'Website Information',
+                    },
+                    {
+                        title: 'Additional Website Information',
+                    },
+                    {
+                        title: 'Upload Photos',
+                    },
+                    {
+                        title: 'Choose A Theme',
+                    },
+                ],
                 formData: {
                     firstName: '',
                     lastName: '',
@@ -180,13 +235,30 @@
                     emailContactUs: '',
                     twitterLink: '',
                     instagramLink: '',
-                }
-            }
+                },
+                htmlContent: ''
+            };
         },
-
-
         methods: {
-           async buildWebsite() {
+            onChangeCurrentTab(index, oldIndex) {
+                console.log(index, oldIndex);
+                this.currentTabIndex = index;
+            },
+
+            onTabBeforeChange() {
+                if (this.currentTabIndex === 0) {
+                    console.log('First Tab');
+                }
+                console.log('All Tabs');
+            },
+
+            wizardCompleted() {
+                console.log('Wizard Completed');
+                this.buildWebsite();
+            },
+
+            buildWebsite() {
+                this.generatingWebsite = true;
                 const payload = {
                     FirstName: this.formData.firstName,
                     LastName: this.formData.lastName,
@@ -204,46 +276,28 @@
                     InstagramLink: this.formData.instagramLink,
                 };
 
+                console.log({payload});
+
                 axios.post(`${url}/websites/build`, payload).then(response => {
+                    console.log({response: response.data});
 
-                    console.log({payload});
-
-                    if (response.status === 400) {
-                        response.json().then(function(data) {
-                            alert("savedddd")
-                        });
+                    if (response.data.link) {
+                        setTimeout(() => {
+                            this.generatingWebsite = false;
+                            window.open(response.data.link, '_blank');
+                        }, 3000);
                     }
-                    this.msg=true;
-                    this.text="website is building.";
                 });
             },
-
-            onStepChanging(event, currentIndex, newIndex, formData) {
-                if (newIndex >= 1) {
-                    $('.actions ul').addClass('actions-next');
-                } else {
-                    $('.actions ul').removeClass('actions-next');
-                }
-
-                if (formData && typeof currentIndex === 'number') {
-                    this.formData[currentIndex] = $('form').serializeArray();
-                }
-
-                return true;
-            },
         },
-
-        mounted() {
-            let vm = this;
-            $(document).on('finished', function (event) {
-                console.log({mountedForm: vm.formData});
-                vm.buildWebsite();
-            });
-        },
-    }
+    };
 </script>
 
 <style>
     @import '../assets/home.css';
     @import '../assets/fonts/material-design-iconic-font/css/material-design-iconic-font.css';
+
+    body {
+        margin: 100px;
+    }
 </style>

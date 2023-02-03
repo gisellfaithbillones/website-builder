@@ -1,46 +1,41 @@
 $(function(){
-    $("#wizard").steps({
+	$("#wizard").steps({
         headerTag: "h4",
         bodyTag: "section",
         transitionEffect: "fade",
         enableAllSteps: true,
         transitionEffectSpeed: 500,
-        onStepChanging: function (event, currentIndex, newIndex, formData) {
+        onStepChanging: function (event, currentIndex, newIndex) { 
             if ( newIndex >= 1 ) {
                 $('.actions ul').addClass('actions-next');
             } else {
                 $('.actions ul').removeClass('actions-next');
             }
-            // Save the form data in the formData object before moving to the next step
-            console.log({stepChangingformData: formData});
-            this.formData.splice(currentIndex, 0, $('form').serializeArray());
-            return true;
+            return true; 
         },
-        onFinished: function (event, currentIndex) {
-            $(document).trigger('finished', [this.formData]);
-        }.bind(this),
         labels: {
             finish: "Finish",
             next: "Continue",
             previous: "Back"
         }
     });
-// Custom Steps
+    // Custom Steps 
     $('.wizard > .steps li a').click(function(){
-        $(this).parent().addClass('checked');
-        $(this).parent().prevAll().addClass('checked');
-        $(this).parent().nextAll().removeClass('checked');
+    	$(this).parent().addClass('checked');
+		$(this).parent().prevAll().addClass('checked');
+		$(this).parent().nextAll().removeClass('checked');
     });
-// Custom Button Jquery Step
+    // Custom Button Jquery Step
     $('.forward').click(function(){
-        $("#wizard").steps('next');
+    	$("#wizard").steps('next');
     });
     $('.backward').click(function(){
         $("#wizard").steps('previous');
     });
-// Input Focus
+    // Input Focus
     $('.form-holder').delegate("input", "focus", function(){
         $('.form-holder').removeClass("active");
         $(this).parent().addClass("active");
     });
 });
+

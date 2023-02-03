@@ -127,7 +127,9 @@ body {
     margin-right: 3px; }
 
 .form-header {
-    display: flex; }
+    display: flex;
+    text-align: center
+}
 .form-header .avartar {
     width: 33.75%; }
 .form-header .avartar a {
