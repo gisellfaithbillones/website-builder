@@ -82,8 +82,6 @@
             <h5 v-if="currentTabIndex === 2">
                 <h4></h4>
                 <section>
-<!--                    <h6> Tell us about your website</h6>-->
-<!--                    <br>-->
                     <div class="form-holder">
                         <input type="text" placeholder="Location" class="form-control"
                                v-model="formData.companyLocation">
@@ -108,67 +106,13 @@
             </h5>
             <h5 v-if="currentTabIndex === 3">
                 <h4></h4>
-                <section>
-                    <div class="grid">
-                        <div class="row">
-                            <div class="mt-1">
-                                <input type="file" name="file-1[]" id="file-2" class="inputfile"
-                                       data-multiple-caption="{count} files selected" multiple/>
-                                <label for="file-1">
-                                    <i class="zmdi zmdi-camera"></i>
-                                    <span> Choose an Image</span>
-                                </label>
-                            </div>
-                            <div class="mt-1">
-                                <input type="file" name="file-1[]" id="file-3" class="inputfile"
-                                       data-multiple-caption="{count} files selected" multiple/>
-                                <label for="file-1">
-                                    <i class="zmdi zmdi-camera"></i>
-                                    <span> Choose an Image</span>
-                                </label>
-                            </div>
-                            <div class="mt-1">
-                                <input type="file" name="file-1[]" id="file-4" class="inputfile"
-                                       data-multiple-caption="{count} files selected" multiple/>
-                                <label for="file-1">
-                                    <i class="zmdi zmdi-camera"></i>
-                                    <span> Choose an Image</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="mt-1">
-                                <input type="file" name="file-1[]" id="file-5" class="inputfile"
-                                       data-multiple-caption="{count} files selected" multiple/>
-                                <label for="file-1">
-                                    <i class="zmdi zmdi-camera"></i>
-                                    <span> Choose an Image</span>
-                                </label>
-                            </div>
-                            <div class="mt-1">
-                                <input type="file" name="file-1[]" id="file-6" class="inputfile"
-                                       data-multiple-caption="{count} files selected" multiple/>
-                                <label for="file-1">
-                                    <i class="zmdi zmdi-camera"></i>
-                                    <span> Choose an Image</span>
-                                </label>
-                            </div>
-                            <div class="mt-1">
-                                <input type="file" name="file-1[]" id="file-7" class="inputfile"
-                                       data-multiple-caption="{count} files selected" multiple/>
-                                <label for="file-1">
-                                    <i class="zmdi zmdi-camera"></i>
-                                    <span> Choose an Image</span>
-                                </label>
-                            </div>
-                        </div>
+                <div v-for="(link, index) in htmlContents" :key="index">
+                    <div :key="index" class="row" v-if="index % 4 === 0">
+                        <iframe :src="htmlContents[index]" class="col-3 big-iframe"></iframe>
+                        <iframe v-if="htmlContents[index + 1]" :src="htmlContents[index + 1]" class="col-3 big-iframe"></iframe>
+                        <iframe v-if="htmlContents[index + 2]" :src="htmlContents[index + 2]" class="col-3 big-iframe"></iframe>
+                        <iframe v-if="htmlContents[index + 3]" :src="htmlContents[index + 3]" class="col-3 big-iframe"></iframe>
                     </div>
-                </section>
-            </h5>
-            <h5 v-if="currentTabIndex === 4">
-                <h4></h4>
-                <div>
-                    <div v-html="htmlContent"></div>
                 </div>
             </h5>
         </Wizard>
@@ -214,9 +158,6 @@
                         title: 'Additional Website Information',
                     },
                     {
-                        title: 'Upload Photos',
-                    },
-                    {
                         title: 'Choose A Theme',
                     },
                 ],
@@ -236,7 +177,7 @@
                     twitterLink: '',
                     instagramLink: '',
                 },
-                htmlContent: ''
+                htmlContents: []
             };
         },
         methods: {
@@ -249,6 +190,10 @@
                 if (this.currentTabIndex === 0) {
                     console.log('First Tab');
                 }
+
+                if (this.currentTabIndex === 2) {
+                    this.buildWebsite();
+                }
                 console.log('All Tabs');
             },
 
@@ -258,7 +203,7 @@
             },
 
             buildWebsite() {
-                this.generatingWebsite = true;
+                // this.generatingWebsite = true;
                 const payload = {
                     FirstName: this.formData.firstName,
                     LastName: this.formData.lastName,
@@ -281,10 +226,11 @@
                 axios.post(`${url}/websites/build`, payload).then(response => {
                     console.log({response: response.data});
 
-                    if (response.data.link) {
+                    if (response.data.links) {
                         setTimeout(() => {
-                            this.generatingWebsite = false;
-                            window.open(response.data.link, '_blank');
+                            // this.generatingWebsite = false;
+                            this.htmlContents = response.data.links;
+                            // window.open(response.data.link, '_blank');
                         }, 3000);
                     }
                 });
@@ -300,4 +246,21 @@
     body {
         margin: 100px;
     }
+
+    iframe {
+        width: 300px;
+        height: 200px;
+        border: none;
+    }
+
+    .row {
+        margin-bottom: 200px;
+    }
+
+    .big-iframe {
+        width: 400px;
+        height: 300px;
+    }
+
+
 </style>
